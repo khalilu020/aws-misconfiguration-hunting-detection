@@ -1,0 +1,13 @@
+{
+  "_comment": "Misconfig 1: deliberately public S3 bucket policy. Principal '*' means any internet user, authenticated or not. s3:GetObject grants read access to every object in the bucket. Applied on top of a per-bucket Block Public Access setting disabled at creation time.",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicReadGetObject",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::YOUR-BUCKET-NAME/*"
+    }
+  ]
+}
