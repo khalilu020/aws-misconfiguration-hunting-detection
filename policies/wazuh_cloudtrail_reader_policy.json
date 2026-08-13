@@ -1,0 +1,17 @@
+{
+  "_comment": "Least-privilege policy for the wazuh-cloudtrail-reader IAM user (Phase 4). Scoped to read-only access on the single CloudTrail log bucket only — this identity cannot touch any other AWS resource or service. Deliberately kept separate from the Prowler scanner credential (different tool, different job).",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::YOUR-CLOUDTRAIL-BUCKET-NAME",
+        "arn:aws:s3:::YOUR-CLOUDTRAIL-BUCKET-NAME/*"
+      ]
+    }
+  ]
+}
