@@ -1,0 +1,34 @@
+<!--
+  Custom Wazuh detection rules — AWS Cloud Security project
+  File location on the Wazuh manager: /var/ossec/etc/rules/local_rules.xml
+  (Never edit the default ruleset directly — it is overwritten on upgrade.)
+-->
+<group name="aws,cloudtrail,iam,">
+
+  <!--
+    Rule 100210: High-risk IAM identity/permission change
+
+    Chains off Wazuh's default rule 80202 (generic "any iam.amazonaws.com event",
+    level 3 / informational, identical description regardless of the specific
+    action). That generic rule provides coverage but no triage — a routine
+    read-only IAM call and an attacker creating a new access key look identical.
+
+    This rule narrows to the specific actions that matter for
+    persistence/privilege-escalation detection and escalates severity
+    accordingly.
+
+    MITRE ATT&CK mapping:
+      T1098 — Account Manipulation
+      T1136 — Create Account
+  -->
+  <rule id="100210" level="10">
+    <if_sid>80202</if_sid>
+    <field name="aws.eventName">^CreateAccessKey$|^AttachUserPolicy$|^AttachRolePolicy$|^PutUserPolicy$|^CreateUser$</field>
+    <description>AWS IAM: High-risk identity/permission change detected - $(aws.eventName) by $(aws.userIdentity.arn)</description>
+    <mitre>
+      <id>T1098</id>
+      <id>T1136</id>
+    </mitre>
+  </rule>
+
+</group>
