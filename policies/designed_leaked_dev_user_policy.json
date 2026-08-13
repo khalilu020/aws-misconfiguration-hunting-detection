@@ -1,0 +1,16 @@
+{
+  "_comment": "DESIGNED BUT NOT EXECUTED (see README, Phase 5). This policy was scoped out as part of a planned IAM privilege-escalation simulation: a low-privilege 'leaked credential' identity with just enough permission (iam:PassRole + ec2:RunInstances) to attach an over-permissive role to a new EC2 instance and harvest its temporary credentials via the Instance Metadata Service. Documented here as the intended design, not as evidence of an executed attack.",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:PassRole",
+        "ec2:RunInstances",
+        "ec2:DescribeInstances",
+        "ec2:TerminateInstances"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
