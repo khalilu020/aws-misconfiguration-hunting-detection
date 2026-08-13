@@ -1,0 +1,42 @@
+<!--
+  AWS S3 wodle configuration — pulls CloudTrail logs from S3 into Wazuh.
+  Insert this block inside <ossec_config>...</ossec_config> in:
+    /var/ossec/etc/ossec.conf
+
+  Notes / gotchas discovered while building this (see README "Challenges &
+  Lessons Learned" for full detail):
+
+  1. Do NOT add a <path> tag for a bucket of type="cloudtrail" — Wazuh's
+     CloudTrail parser already auto-prepends "AWSLogs/" internally. Adding
+     an explicit <path>AWSLogs</path> causes a duplicated prefix
+     ("AWSLogs/AWSLogs/") and the module silently finds zero logs.
+
+  2. The <aws_profile> value below must exactly match a profile name in
+     the AWS credentials file used by the wazuh service account
+     (typically /var/ossec/.aws/credentials on Debian/Ubuntu installs).
+
+  3. If wazuh-manager runs under systemd, boto3 may fail to locate that
+     credentials file with "The config profile could not be found" even
+     when the file is present and correctly permissioned — systemd
+     services do not always inherit $HOME the way an interactive shell
+     session does. Fix via a systemd override setting
+     Environment="HOME=/var/ossec" (or wherever your wazuh user's home
+     directory actually is — confirm with: grep wazuh /etc/passwd).
+
+  4. If wazuh-analysisd logs "ERROR: Too many fields for JSON decoder",
+     raise analysisd.decoder_order_size (default 256, max 1024) in
+     /var/ossec/etc/local_internal_options.conf. This is a known,
+     documented limitation with large/nested CloudTrail events
+     (e.g. IAM policy documents in requestParameters) and is not
+     guaranteed to fully eliminate the error even at the maximum value.
+-->
+<wodle name="aws-s3">
+  <disabled>no</disabled>
+  <interval>10m</interval>
+  <run_on_start>yes</run_on_start>
+  <skip_on_error>no</skip_on_error>
+  <bucket type="cloudtrail">
+    <name>YOUR-CLOUDTRAIL-BUCKET-NAME</name>
+    <aws_profile>wazuh-cloudtrail</aws_profile>
+  </bucket>
+</wodle>
